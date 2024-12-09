@@ -1,3 +1,5 @@
+import 'package:cointracker/screens/client/menu.dart';
+import 'package:cointracker/screens/client/search.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -26,6 +28,16 @@ final routes = GoRouter(
           parentNavigatorKey: _shellNavigatorKey,
           path: '/home',
           pageBuilder: (context, state) => const NoTransitionPage(child: HomeScreenFrame()),
+        ),
+        GoRoute(
+          parentNavigatorKey: _shellNavigatorKey,
+          path: '/search',
+          pageBuilder: (context, state) => const NoTransitionPage(child: SearchScreen()),
+        ),
+        GoRoute(
+          parentNavigatorKey: _shellNavigatorKey,
+          path: '/menu',
+          pageBuilder: (context, state) => const NoTransitionPage(child: MenuScreen()),
         ),
       ],
     ),

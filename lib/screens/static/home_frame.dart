@@ -10,6 +10,9 @@ class HomeScreenFrame extends StatefulWidget {
 class _HomeScreenFrameState extends State<HomeScreenFrame> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(),
+      body: const Text("Home Screen"),
+    );
   }
 }

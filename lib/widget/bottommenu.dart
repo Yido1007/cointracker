@@ -14,12 +14,10 @@ class BottomMenu extends StatelessWidget {
     switch (currentPath) {
       case "/home":
         return 0;
-      case "/news":
+      case "/search":
         return 1;
-      case "/exchange":
+      case "/menu":
         return 2;
-      case "/settings":
-        return 3;
       default:
         return 0;
     }
@@ -35,13 +33,10 @@ class BottomMenu extends StatelessWidget {
             GoRouter.of(context).go("/home");
             break;
           case 1:
-            GoRouter.of(context).go("/news");
+            GoRouter.of(context).go("/search");
             break;
           case 2:
-            GoRouter.of(context).go("/exchange");
-            break;
-          case 3:
-            GoRouter.of(context).go("/settings");
+            GoRouter.of(context).go("/menu");
             break;
         }
       },
@@ -52,18 +47,13 @@ class BottomMenu extends StatelessWidget {
           label: ("home"),
         ),
         BottomNavigationBarItem(
-          icon: const Icon(CupertinoIcons.news),
+          icon: const Icon(Icons.newspaper),
           label: ("news"),
         ),
         // Coins Screen Navigation
         BottomNavigationBarItem(
-          icon: const Icon(CupertinoIcons.money_dollar),
-          label: ("exchange"),
-        ),
-        // Settings Screen Navigation
-        BottomNavigationBarItem(
           icon: const Icon(Icons.settings),
-          label: ("settings"),
+          label: ("menu"),
         ),
       ],
     );
