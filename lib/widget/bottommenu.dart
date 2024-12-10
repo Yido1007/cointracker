@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,18 +40,18 @@ class BottomMenu extends StatelessWidget {
         }
       },
       // Home Screen Navigation
-      items: <BottomNavigationBarItem>[
+      items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: const Icon(Icons.home_outlined),
+          icon: Icon(Icons.home_outlined),
           label: ("home"),
         ),
         BottomNavigationBarItem(
-          icon: const Icon(Icons.newspaper),
+          icon: Icon(Icons.newspaper),
           label: ("news"),
         ),
         // Coins Screen Navigation
         BottomNavigationBarItem(
-          icon: const Icon(Icons.settings),
+          icon: Icon(Icons.settings),
           label: ("menu"),
         ),
       ],

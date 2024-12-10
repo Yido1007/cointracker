@@ -49,7 +49,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
         future: futureSpots,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Hata: ${snapshot.error}'));
           }
@@ -64,7 +64,6 @@ class _CoinChartPageState extends State<CoinChartPage> {
                     spots: spots,
                     isCurved: true,
                     color: Colors.blue,
-                    barWidth: 4,
                   ),
                 ],
               ),
