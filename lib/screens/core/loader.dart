@@ -51,7 +51,7 @@ class _LoaderScreenState extends State<LoaderScreen> {
             ),
           );
         }
-        return const SizedBox.shrink(); // Boş bir widget
+        return const SizedBox.shrink();
       },
     );
   }
