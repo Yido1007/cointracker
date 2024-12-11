@@ -14,9 +14,9 @@ class CoinChartPage extends StatefulWidget {
 
 class _CoinChartPageState extends State<CoinChartPage> {
   late Future<List<FlSpot>> futureSpots;
-  List<String> timeLabels = []; // Saat etiketleri
-  double minY = 0; // Y ekseninin minimum değeri
-  double maxY = 0; // Y ekseninin maksimum değeri
+  List<String> timeLabels = [];
+  double minY = 0;
+  double maxY = 0;
 
   Future<List<FlSpot>> fetchCoinPrices() async {
     final url = Uri.parse(
@@ -26,10 +26,8 @@ class _CoinChartPageState extends State<CoinChartPage> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> prices = data['prices'];
-
-      // Saat bilgilerini ve fiyatları dönüştürüyoruz
       timeLabels = prices.map((entry) {
-        final timestamp = entry[0]; // Zaman damgası (milisaniye)
+        final timestamp = entry[0];
         final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
         return '${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}';
       }).toList();
@@ -40,12 +38,9 @@ class _CoinChartPageState extends State<CoinChartPage> {
           .map((entry) => FlSpot(entry.key.toDouble(), entry.value[1]))
           .toList();
 
-      // Minimum ve maksimum fiyatları hesapla
       minY = spots.map((spot) => spot.y).reduce((a, b) => a < b ? a : b);
       maxY = spots.map((spot) => spot.y).reduce((a, b) => a > b ? a : b);
-
-      // Min/max değerlerini daha iyi görünürlük için genişlet
-      const double padding = 0.1; // %10 ek genişlik
+      const double padding = 0.2;
       final range = maxY - minY;
       minY -= range * padding;
       maxY += range * padding;
@@ -87,23 +82,15 @@ class _CoinChartPageState extends State<CoinChartPage> {
                     spots: spots,
                     isCurved: true,
                     color: Colors.blue,
-                    barWidth: 3,
                     belowBarData: BarAreaData(show: false),
                   ),
                 ],
-                minY: minY, // Y ekseni için minimum değer
-                maxY: maxY, // Y ekseni için maksimum değer
+                minY: minY,
+                maxY: maxY,
                 titlesData: FlTitlesData(
-                  leftTitles: AxisTitles(
+                  leftTitles: const AxisTitles(
                     sideTitles: SideTitles(
-                      showTitles: true,
-                      reservedSize: 40,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toStringAsFixed(2),
-                          style: const TextStyle(fontSize: 12),
-                        );
-                      },
+                      showTitles: false,
                     ),
                   ),
                   bottomTitles: AxisTitles(
@@ -115,7 +102,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
                         if (index >= 0 && index < timeLabels.length) {
                           return Text(
                             timeLabels[index],
-                            style: const TextStyle(fontSize: 10),
+                            style: const TextStyle(fontSize: 12),
                           );
                         }
                         return const SizedBox.shrink();
