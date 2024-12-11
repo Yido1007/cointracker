@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class CoinChartPage extends StatefulWidget {
   final String coinId;
 
-  CoinChartPage({required this.coinId});
+  const CoinChartPage({super.key, required this.coinId});
 
   @override
   _CoinChartPageState createState() => _CoinChartPageState();
@@ -98,103 +98,108 @@ class _CoinChartPageState extends State<CoinChartPage> {
       appBar: AppBar(
         title: Text('${widget.coinId.toUpperCase()} Grafiği'),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<FlSpot>>(
-              future: futureSpots,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Hata: ${snapshot.error}'));
-                }
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.55,
+              child: FutureBuilder<List<FlSpot>>(
+                future: futureSpots,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Hata: ${snapshot.error}'));
+                  }
 
-                final spots = snapshot.data!;
-                return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: LineChart(LineChartData(
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: spots,
-                        isCurved: true,
-                        color: Colors.blue,
-                        barWidth: 1.5,
-                        belowBarData: BarAreaData(show: true),
-                        dotData: const FlDotData(
-                          show: false,
+                  final spots = snapshot.data!;
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: LineChart(
+                      LineChartData(
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: spots,
+                            isCurved: true,
+                            color: Colors.blue,
+                            barWidth: 3,
+                            belowBarData: BarAreaData(show: false),
+                            dotData: const FlDotData(show: false), // Noktaları gizle
+                          ),
+                        ],
+                        minY: minY,
+                        maxY: maxY,
+                        titlesData: FlTitlesData(
+                          leftTitles: const AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: false,
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 40,
+                              getTitlesWidget: (value, meta) {
+                                final index = value.toInt();
+                                if (index >= 0 && index < timeLabels.length - 1) {
+                                  return Text(
+                                    timeLabels[index],
+                                    style: const TextStyle(fontSize: 10),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        ),
+                        lineTouchData: LineTouchData(
+                          touchTooltipData: LineTouchTooltipData(
+                            getTooltipColor: (touchedSpot) => Colors.black,
+                            getTooltipItems: (touchedSpots) {
+                              return touchedSpots.map((spot) {
+                                final index = spot.x.toInt();
+                                final time = index >= 0 && index < timeLabels.length
+                                    ? timeLabels[index]
+                                    : 'Bilinmiyor';
+                                return LineTooltipItem(
+                                  selectedRange == '1'
+                                      ? 'Saat: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}'
+                                      : 'Tarih: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}',
+                                  const TextStyle(color: Colors.white),
+                                );
+                              }).toList();
+                            },
+                          ),
+                          handleBuiltInTouches: true,
                         ),
                       ),
-                    ],
-                    minY: minY,
-                    maxY: maxY,
-                    titlesData: FlTitlesData(
-                      leftTitles: const AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: false,
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            final index = value.toInt();
-                            if (index >= 0 && index < timeLabels.length - 1) {
-                              return Text(
-                                timeLabels[index],
-                                style: const TextStyle(fontSize: 12),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                      ),
-                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     ),
-                    lineTouchData: LineTouchData(
-                      touchTooltipData: LineTouchTooltipData(
-                        getTooltipColor: (touchedSpot) => Colors.black,
-                        getTooltipItems: (touchedSpots) {
-                          return touchedSpots.map((spot) {
-                            final index = spot.x.toInt();
-                            final time = index >= 0 && index < timeLabels.length
-                                ? timeLabels[index]
-                                : 'Bilinmiyor';
-                            return LineTooltipItem(
-                              selectedRange == '1'
-                                  ? 'Saat: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}'
-                                  : 'Tarih: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}',
-                              const TextStyle(color: Colors.white),
-                            );
-                          }).toList();
-                        },
-                      ),
-                      handleBuiltInTouches: true,
-                    ),
-                  )),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () => updateChartRange('1'),
-                child: const Text('1 Günlük'),
-              ),
-              ElevatedButton(
-                onPressed: () => updateChartRange('7'),
-                child: const Text('1 Haftalık'),
-              ),
-              ElevatedButton(
-                onPressed: () => updateChartRange('90'),
-                child: const Text('3 Aylık'),
-              ),
-            ],
-          ),
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () => updateChartRange('1'),
+                  child: const Text('1 Günlük'),
+                ),
+                ElevatedButton(
+                  onPressed: () => updateChartRange('7'),
+                  child: const Text('1 Haftalık'),
+                ),
+                ElevatedButton(
+                  onPressed: () => updateChartRange('90'),
+                  child: const Text('3 Aylık'),
+                ),
+              ],
+            ),
+            // Diğer içerikler eklenebilir
+          ],
+        ),
       ),
     );
   }
