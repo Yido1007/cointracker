@@ -1,4 +1,3 @@
-// coinchart.dart
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -15,6 +14,7 @@ class CoinChartPage extends StatefulWidget {
 
 class _CoinChartPageState extends State<CoinChartPage> {
   late Future<List<FlSpot>> futureSpots;
+  late Future<Map<String, dynamic>> coinStats;
   List<String> timeLabels = [];
   double minY = 0;
   double maxY = 0;
@@ -55,7 +55,6 @@ class _CoinChartPageState extends State<CoinChartPage> {
       minY -= range * padding;
       maxY += range * padding;
 
-      // Dinamik interval hesaplama
       interval = calculateDynamicInterval(minY, maxY);
 
       return spots;
@@ -64,18 +63,36 @@ class _CoinChartPageState extends State<CoinChartPage> {
     }
   }
 
+  Future<Map<String, dynamic>> fetchCoinStats() async {
+    final url = Uri.parse('https://api.coingecko.com/api/v3/coins/${widget.coinId}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return {
+        'popularity': data['market_cap_rank'],
+        'marketCap': data['market_data']['market_cap']['usd'],
+        'high24h': data['market_data']['high_24h']['usd'],
+        'low24h': data['market_data']['low_24h']['usd'],
+        'allTimeHigh': data['market_data']['ath']['usd'],
+      };
+    } else {
+      throw Exception('Coin istatistikleri alınamadı!');
+    }
+  }
+
   double calculateDynamicInterval(double min, double max) {
     final range = max - min;
     if (range < 1) {
-      return 0.1; // Küçük fiyatlar için küçük aralık
+      return 0.1;
     } else if (range < 10) {
-      return 1; // 1-10 arasında fiyatlar için
+      return 1;
     } else if (range < 100) {
-      return 10; // 10-100 arasında fiyatlar için
+      return 10;
     } else if (range < 1000) {
-      return 50; // 100-1000 arasında fiyatlar için
+      return 50;
     } else {
-      return 500; // Büyük fiyatlar için daha büyük aralık
+      return 500;
     }
   }
 
@@ -83,6 +100,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
   void initState() {
     super.initState();
     futureSpots = fetchCoinPrices(selectedRange);
+    coinStats = fetchCoinStats();
   }
 
   void updateChartRange(String range) {
@@ -124,7 +142,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
                             color: Colors.blue,
                             barWidth: 3,
                             belowBarData: BarAreaData(show: false),
-                            dotData: const FlDotData(show: false), // Noktaları gizle
+                            dotData: const FlDotData(show: false),
                           ),
                         ],
                         minY: minY,
@@ -197,7 +215,36 @@ class _CoinChartPageState extends State<CoinChartPage> {
                 ),
               ],
             ),
-            // Diğer içerikler eklenebilir
+            FutureBuilder<Map<String, dynamic>>(
+              future: coinStats,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Hata: ${snapshot.error}'));
+                }
+
+                final stats = snapshot.data!;
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Popülerlik Sırası: #${stats['popularity']}',
+                          style: const TextStyle(fontSize: 16)),
+                      Text('Piyasa Değeri: \$${stats['marketCap']}',
+                          style: const TextStyle(fontSize: 16)),
+                      Text('24 Saat Yüksek: \$${stats['high24h']}',
+                          style: const TextStyle(fontSize: 16)),
+                      Text('24 Saat Düşük: \$${stats['low24h']}',
+                          style: const TextStyle(fontSize: 16)),
+                      Text('Tüm Zamanların En Yükseği: \$${stats['allTimeHigh']}',
+                          style: const TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
