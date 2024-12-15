@@ -19,7 +19,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
   double minY = 0;
   double maxY = 0;
   double interval = 0;
-  String selectedRange = '1'; // Default to 1-day range
+  String selectedRange = '1';
 
   Future<List<FlSpot>> fetchCoinPrices(String days) async {
     final url = Uri.parse(
@@ -70,11 +70,13 @@ class _CoinChartPageState extends State<CoinChartPage> {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return {
-        'popularity': data['market_cap_rank'],
-        'marketCap': data['market_data']['market_cap']['usd'],
-        'high24h': data['market_data']['high_24h']['usd'],
-        'low24h': data['market_data']['low_24h']['usd'],
-        'allTimeHigh': data['market_data']['ath']['usd'],
+        'popularity': data['market_cap_rank'] ?? 0, // Varsayılan değer
+        'marketCap': (data['market_data']['market_cap']['usd'] ?? 0).toDouble(),
+        'high24h': (data['market_data']['high_24h']['usd'] ?? 0).toDouble(),
+        'low24h': (data['market_data']['low_24h']['usd'] ?? 0).toDouble(),
+        'allTimeHigh': (data['market_data']['ath']['usd'] ?? 0).toDouble(),
+        'volume24h': (data['market_data']['total_volume']['usd'] ?? 0).toDouble(),
+        'volumeChange24h': (data['market_data']['price_change_percentage_24h'] ?? 0).toDouble(),
       };
     } else {
       throw Exception('Coin istatistikleri alınamadı!');
@@ -107,6 +109,18 @@ class _CoinChartPageState extends State<CoinChartPage> {
       return '${(marketCapDouble / 1e6).toStringAsFixed(2)} milyon dolar';
     } else {
       return '\$${marketCapDouble.toStringAsFixed(2)}';
+    }
+  }
+
+  String formatVolume(double volume) {
+    if (volume >= 1e12) {
+      return '${(volume / 1e12).toStringAsFixed(2)} trilyon dolar';
+    } else if (volume >= 1e9) {
+      return '${(volume / 1e9).toStringAsFixed(2)} milyar dolar';
+    } else if (volume >= 1e6) {
+      return '${(volume / 1e6).toStringAsFixed(2)} milyon dolar';
+    } else {
+      return '\$${volume.toStringAsFixed(2)}';
     }
   }
 
@@ -154,6 +168,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
                             spots: spots,
                             isCurved: true,
                             color: Colors.blue,
+                            shadow: const Shadow(color: Colors.black38),
                             barWidth: 3,
                             belowBarData: BarAreaData(show: false),
                             dotData: const FlDotData(show: false),
@@ -240,15 +255,27 @@ class _CoinChartPageState extends State<CoinChartPage> {
                 final stats = snapshot.data!;
                 final marketCap = stats['marketCap'];
                 return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: const EdgeInsets.all(20.0),
+                  child: GridView(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 15,
+                      childAspectRatio: 5,
+                    ),
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Scroll yeteneğini devre dışı bırakır
                     children: [
-                      Text('Popülerlik Sırası: #${stats['popularity']}'),
-                      Text('Piyasa Değeri: ${formatMarketCap(marketCap)}'),
-                      Text('24 Saat Yüksek: \$${stats['high24h']}'),
-                      Text('24 Saat Düşük: \$${stats['low24h']}'),
-                      Text('Tüm Zamanların En Yükseği: \$${stats['allTimeHigh']}'),
+                      Text('Popülerlik Sırası:\n#${stats['popularity']}',
+                          textAlign: TextAlign.start),
+                      Text('Piyasa Değeri:\n${formatMarketCap(marketCap)}',
+                          textAlign: TextAlign.start),
+                      Text('24 Küresel Hacim:\n${formatVolume(stats['volume24h'])}',
+                          textAlign: TextAlign.start),
+                      Text('24S Hacim Değişimi:\n${stats['volumeChange24h'].toStringAsFixed(2)}%',
+                          textAlign: TextAlign.start),
+                      Text('24S En Yüksek:\n\$${stats['high24h']}', textAlign: TextAlign.start),
+                      Text('24S En Düşük:\n\$${stats['low24h']}', textAlign: TextAlign.start),
                     ],
                   ),
                 );
