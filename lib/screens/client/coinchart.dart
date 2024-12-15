@@ -96,6 +96,20 @@ class _CoinChartPageState extends State<CoinChartPage> {
     }
   }
 
+  String formatMarketCap(num marketCap) {
+    // num kullanıyoruz, hem int hem double kabul eder.
+    final double marketCapDouble = marketCap.toDouble(); // marketCap'i double'a dönüştür
+    if (marketCapDouble >= 1e12) {
+      return '${(marketCapDouble / 1e12).toStringAsFixed(2)} trilyon dolar';
+    } else if (marketCapDouble >= 1e9) {
+      return '${(marketCapDouble / 1e9).toStringAsFixed(2)} milyar dolar';
+    } else if (marketCapDouble >= 1e6) {
+      return '${(marketCapDouble / 1e6).toStringAsFixed(2)} milyon dolar';
+    } else {
+      return '\$${marketCapDouble.toStringAsFixed(2)}';
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -223,23 +237,18 @@ class _CoinChartPageState extends State<CoinChartPage> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Hata: ${snapshot.error}'));
                 }
-
                 final stats = snapshot.data!;
+                final marketCap = stats['marketCap'];
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Popülerlik Sırası: #${stats['popularity']}',
-                          style: const TextStyle(fontSize: 16)),
-                      Text('Piyasa Değeri: \$${stats['marketCap']}',
-                          style: const TextStyle(fontSize: 16)),
-                      Text('24 Saat Yüksek: \$${stats['high24h']}',
-                          style: const TextStyle(fontSize: 16)),
-                      Text('24 Saat Düşük: \$${stats['low24h']}',
-                          style: const TextStyle(fontSize: 16)),
-                      Text('Tüm Zamanların En Yükseği: \$${stats['allTimeHigh']}',
-                          style: const TextStyle(fontSize: 16)),
+                      Text('Popülerlik Sırası: #${stats['popularity']}'),
+                      Text('Piyasa Değeri: ${formatMarketCap(marketCap)}'),
+                      Text('24 Saat Yüksek: \$${stats['high24h']}'),
+                      Text('24 Saat Düşük: \$${stats['low24h']}'),
+                      Text('Tüm Zamanların En Yükseği: \$${stats['allTimeHigh']}'),
                     ],
                   ),
                 );
