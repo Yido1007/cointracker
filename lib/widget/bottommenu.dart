@@ -46,8 +46,8 @@ class BottomMenu extends StatelessWidget {
           label: ("home"),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.newspaper),
-          label: ("news"),
+          icon: Icon(Icons.search),
+          label: ("search"),
         ),
         // Coins Screen Navigation
         BottomNavigationBarItem(
