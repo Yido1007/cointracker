@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // GoRouter'ı ekleyin
+import 'package:go_router/go_router.dart';
 import '../../model/coin.dart';
 import '../../services/coin.dart';
 
@@ -61,7 +61,6 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
                     style: TextStyle(color: priceChangeColor),
                   ),
                   onTap: () {
-                    // GoRouter ile yönlendirme
                     context.push('/coin_chart/${coin.id}');
                   },
                 );

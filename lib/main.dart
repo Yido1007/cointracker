@@ -1,3 +1,4 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 import 'core/routes.dart';
@@ -14,6 +15,9 @@ class MainApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: routes,
+      theme: FlexThemeData.light(scheme: FlexScheme.deepPurple), // Açık mod teması
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.deepPurple), // Koyu mod teması
+      themeMode: ThemeMode.system, // Sistem temasını takip eder
     );
   }
 }
