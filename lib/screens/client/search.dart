@@ -1,20 +1,30 @@
-import 'package:cointracker/screens/client/coinchart.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'coinchart.dart'; // Grafik sayfasını içe aktar
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController searchController = TextEditingController();
   List<dynamic> searchResults = [];
+  List<Map<String, dynamic>> searchHistory = [];
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadSearchHistory(); // Uygulama açıldığında geçmişi yükle
+  }
+
+  // Coinleri API'den ara
   Future<void> searchCoins(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -27,21 +37,82 @@ class _SearchScreenState extends State<SearchScreen> {
       isLoading = true;
     });
 
-    final url = Uri.parse('https://api.coingecko.com/api/v3/search?query=$query');
-    final response = await http.get(url);
+    try {
+      final url = Uri.parse('https://api.coingecko.com/api/v3/search?query=$query');
+      final response = await http.get(url);
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        searchResults = data['coins'];
-        isLoading = false;
-      });
-    } else {
+      print('HTTP Durum Kodu: ${response.statusCode}');
+      print('API Yanıtı: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['coins'] != null) {
+          setState(() {
+            searchResults = data['coins'];
+            isLoading = false;
+          });
+        } else {
+          throw Exception('API yanıtında beklenen veri bulunamadı!');
+        }
+      } else {
+        throw Exception('HTTP isteği başarısız oldu. Durum Kodu: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Hata: $e');
       setState(() {
         searchResults = [];
         isLoading = false;
       });
       throw Exception('Coin bilgisi alınamadı!');
+    }
+  }
+
+  // Yerel dosyadan geçmişi yükle
+  Future<void> _loadSearchHistory() async {
+    try {
+      final file = await _getHistoryFile();
+      if (await file.exists()) {
+        final contents = await file.readAsString();
+        setState(() {
+          searchHistory = List<Map<String, dynamic>>.from(json.decode(contents));
+        });
+      }
+    } catch (e) {
+      print('Geçmiş yüklenirken hata: $e');
+    }
+  }
+
+  Future<void> _saveSearchHistory() async {
+    try {
+      final file = await _getHistoryFile();
+      final contents = json.encode(searchHistory);
+      await file.writeAsString(contents);
+    } catch (e) {
+      print('Geçmiş kaydedilirken hata: $e');
+    }
+  }
+
+  Future<File> _getHistoryFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/search_history.json');
+  }
+
+  void addToHistory(Map<String, dynamic> coin) {
+    setState(() {
+      if (!searchHistory.any((item) => item['id'] == coin['id'])) {
+        searchHistory.add(coin);
+      }
+    });
+    _saveSearchHistory();
+  }
+
+  void clearHistory() async {
+    setState(() {
+      searchHistory.clear();
+    });
+    final file = await _getHistoryFile();
+    if (await file.exists()) {
+      await file.delete();
     }
   }
 
@@ -77,32 +148,87 @@ class _SearchScreenState extends State<SearchScreen> {
             const SizedBox(height: 16),
             if (isLoading) const CircularProgressIndicator(),
             Expanded(
-              child: searchResults.isEmpty
-                  ? const Center(child: Text('Sonuç bulunamadı'))
-                  : ListView.builder(
-                      itemCount: searchResults.length,
-                      itemBuilder: (context, index) {
-                        final coin = searchResults[index];
-                        return ListTile(
-                          leading: Image.network(
-                            coin['thumb'],
-                            width: 40,
-                            height: 40,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: searchResults.isEmpty
+                        ? const Center(child: Text('Sonuç bulunamadı'))
+                        : ListView.builder(
+                            itemCount: searchResults.length,
+                            itemBuilder: (context, index) {
+                              final coin = searchResults[index];
+                              return ListTile(
+                                leading: Image.network(
+                                  coin['thumb'],
+                                  width: 40,
+                                  height: 40,
+                                ),
+                                title: Text(coin['name']),
+                                subtitle: Text(coin['symbol'].toUpperCase()),
+                                onTap: () {
+                                  addToHistory(coin);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CoinChartPage(coinId: coin['id']),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
                           ),
-                          title: Text(coin['name']),
-                          subtitle: Text(coin['symbol'].toUpperCase()),
-                          onTap: () {
-                            // Grafik sayfasına yönlendirme
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CoinChartPage(coinId: coin['id']),
+                  ),
+                  if (searchHistory.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Geçmiş',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            TextButton(
+                              onPressed: clearHistory,
+                              child: const Text(
+                                'Temizle',
+                                style: TextStyle(color: Colors.red),
                               ),
-                            );
-                          },
-                        );
-                      },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        SizedBox(
+                          height: 150,
+                          child: ListView.builder(
+                            itemCount: searchHistory.length,
+                            itemBuilder: (context, index) {
+                              final coin = searchHistory[index];
+                              return ListTile(
+                                leading: Image.network(
+                                  coin['thumb'],
+                                  width: 40,
+                                  height: 40,
+                                ),
+                                title: Text(coin['name']),
+                                subtitle: Text(coin['symbol'].toUpperCase()),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CoinChartPage(coinId: coin['id']),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
+                ],
+              ),
             ),
           ],
         ),

@@ -32,7 +32,7 @@ final routes = GoRouter(
         GoRoute(
           parentNavigatorKey: _shellNavigatorKey,
           path: '/search',
-          pageBuilder: (context, state) => const NoTransitionPage(child: SearchScreen()),
+          pageBuilder: (context, state) => NoTransitionPage(child: SearchScreen()),
         ),
         GoRoute(
           parentNavigatorKey: _shellNavigatorKey,
