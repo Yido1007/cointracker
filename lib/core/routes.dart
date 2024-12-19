@@ -3,6 +3,7 @@ import 'package:cointracker/screens/client/search.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../screens/client/coinchart.dart';
 import '../screens/core/loader.dart';
 import '../screens/home.dart';
 import '../screens/core/eror.dart';
@@ -48,6 +49,15 @@ final routes = GoRouter(
     GoRoute(
       path: '/boarding',
       builder: (context, state) => const BoardingScreen(),
+    ),
+    // CoinChartPage için üst düzey rota
+    GoRoute(
+      path: '/coin_chart/:coinId',
+      builder: (context, state) {
+        // Dinamik rota parametresini alıyoruz
+        final coinId = state.pathParameters['coinId'] ?? 'default_coin';
+        return CoinChartPage(coinId: coinId);
+      },
     ),
   ],
 );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart'; // GoRouter'ı ekleyin
 import '../../model/coin.dart';
 import '../../services/coin.dart';
-import '../client/coinchart.dart';
 
 class HomeScreenFrame extends StatefulWidget {
   const HomeScreenFrame({super.key});
@@ -32,7 +32,7 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
         title: const Text('Coin Listesi'),
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshCoins, 
+        onRefresh: _refreshCoins,
         child: FutureBuilder<List<Coin>>(
           future: futureCoins,
           builder: (context, snapshot) {
@@ -61,12 +61,8 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
                     style: TextStyle(color: priceChangeColor),
                   ),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CoinChartPage(coinId: coin.id),
-                      ),
-                    );
+                    // GoRouter ile yönlendirme
+                    context.push('/coin_chart/${coin.id}');
                   },
                 );
               },
