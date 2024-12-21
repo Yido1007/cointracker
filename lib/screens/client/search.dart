@@ -191,9 +191,9 @@ class _SearchScreenState extends State<SearchScreen> {
                             ),
                             TextButton(
                               onPressed: clearHistory,
-                              child: const Text(
+                              child: Text(
                                 'Temizle',
-                                style: TextStyle(color: Colors.red),
+                                style: TextStyle(color: Theme.of(context).colorScheme.error),
                               ),
                             ),
                           ],

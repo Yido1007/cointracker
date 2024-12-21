@@ -49,8 +49,9 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
               itemCount: coins.length,
               itemBuilder: (context, index) {
                 final coin = coins[index];
-                final priceChangeColor =
-                    coin.priceChangePercentage24h >= 0 ? Colors.green : Colors.red;
+                final priceChangeColor = coin.priceChangePercentage24h >= 0
+                    ? Colors.green
+                    : Theme.of(context).colorScheme.error;
 
                 return ListTile(
                   leading: Image.network(coin.image, width: 40, height: 40),

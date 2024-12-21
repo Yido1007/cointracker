@@ -167,7 +167,7 @@ class _CoinChartPageState extends State<CoinChartPage> {
                           LineChartBarData(
                             spots: spots,
                             isCurved: true,
-                            color: Colors.blue,
+                            color: Theme.of(context).colorScheme.primary,
                             shadow: const Shadow(color: Colors.black38),
                             barWidth: 3,
                             belowBarData: BarAreaData(show: false),
@@ -203,7 +203,8 @@ class _CoinChartPageState extends State<CoinChartPage> {
                         ),
                         lineTouchData: LineTouchData(
                           touchTooltipData: LineTouchTooltipData(
-                            getTooltipColor: (touchedSpot) => Colors.black,
+                            getTooltipColor: (touchedSpot) =>
+                                Theme.of(context).colorScheme.secondary,
                             getTooltipItems: (touchedSpots) {
                               return touchedSpots.map((spot) {
                                 final index = spot.x.toInt();
