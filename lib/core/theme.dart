@@ -1,81 +1,18 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-final lightTheme = FlexThemeData.light(
-  scheme: FlexScheme.deepBlue,
-  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-  blendLevel: 7,
-  subThemesData: const FlexSubThemesData(
-    blendOnLevel: 10,
-    blendOnColors: false,
-    useTextTheme: true,
-    useM2StyleDividerInM3: true,
-    filledButtonRadius: 15.0,
-    elevatedButtonRadius: 15.0,
-    outlinedButtonRadius: 15.0,
-    outlinedButtonBorderWidth: 2.0,
-    inputDecoratorRadius: 15.0,
-    fabUseShape: true,
-    fabRadius: 15.0,
-    chipRadius: 15.0,
-    cardRadius: 21.0,
-    popupMenuRadius: 7.0,
-    popupMenuElevation: 9.0,
-    alignedDropdown: true,
-    useInputDecoratorThemeInDialogs: true,
-    bottomNavigationBarSelectedLabelSchemeColor: SchemeColor.tertiary,
-    bottomNavigationBarSelectedIconSchemeColor: SchemeColor.tertiary,
-    navigationBarSelectedLabelSchemeColor: SchemeColor.onSurface,
-    navigationBarUnselectedLabelSchemeColor: SchemeColor.onSurface,
-    navigationBarMutedUnselectedLabel: false,
-    navigationBarSelectedIconSchemeColor: SchemeColor.primaryContainer,
-    navigationBarUnselectedIconSchemeColor: SchemeColor.onSurface,
-    navigationBarMutedUnselectedIcon: false,
-    navigationBarIndicatorSchemeColor: SchemeColor.secondary,
-    navigationBarIndicatorOpacity: 1.00,
-    navigationBarIndicatorRadius: 20.0,
-    navigationBarElevation: 0.0,
-    navigationBarHeight: 85.0,
-  ),
-);
-
-final darkTheme = FlexThemeData.dark(
-  scheme: FlexScheme.deepBlue,
-  surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-  blendLevel: 13,
-  bottomAppBarElevation: 0.0,
-  subThemesData: const FlexSubThemesData(
-    blendOnLevel: 20,
-    useTextTheme: true,
-    useM2StyleDividerInM3: true,
-    filledButtonRadius: 15.0,
-    elevatedButtonRadius: 15.0,
-    outlinedButtonRadius: 15.0,
-    outlinedButtonBorderWidth: 2.0,
-    inputDecoratorSchemeColor: SchemeColor.tertiaryContainer,
-    inputDecoratorBackgroundAlpha: 51,
-    inputDecoratorBorderSchemeColor: SchemeColor.secondary,
-    inputDecoratorRadius: 15.0,
-    fabUseShape: true,
-    fabRadius: 15.0,
-    chipRadius: 15.0,
-    cardRadius: 21.0,
-    popupMenuRadius: 7.0,
-    popupMenuElevation: 9.0,
-    alignedDropdown: true,
-    useInputDecoratorThemeInDialogs: true,
-    appBarScrolledUnderElevation: 0.0,
-    bottomNavigationBarSelectedLabelSchemeColor: SchemeColor.tertiary,
-    bottomNavigationBarSelectedIconSchemeColor: SchemeColor.tertiary,
-    navigationBarSelectedLabelSchemeColor: SchemeColor.onSurface,
-    navigationBarUnselectedLabelSchemeColor: SchemeColor.onSurface,
-    navigationBarMutedUnselectedLabel: false,
-    navigationBarSelectedIconSchemeColor: SchemeColor.primaryContainer,
-    navigationBarUnselectedIconSchemeColor: SchemeColor.onSurface,
-    navigationBarMutedUnselectedIcon: false,
-    navigationBarIndicatorSchemeColor: SchemeColor.secondary,
-    navigationBarIndicatorOpacity: 1.00,
-    navigationBarIndicatorRadius: 20.0,
-    navigationBarElevation: 0.0,
-    navigationBarHeight: 85.0,
-  ),
-);
+sealed class AppTheme {
+  // The defined light theme.
+  static ThemeData light = FlexThemeData.light(
+    scheme: FlexScheme.red,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+  );
+  // The defined dark theme.
+  static ThemeData dark = FlexThemeData.dark(
+    scheme: FlexScheme.red,
+    visualDensity: FlexColorScheme.comfortablePlatformDensity,
+    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
+  );
+}
