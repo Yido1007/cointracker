@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/notifier.dart';
+import '../../provider/theme.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});

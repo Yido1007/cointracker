@@ -1,4 +1,4 @@
-import 'package:cointracker/core/notifier.dart';
+import 'package:cointracker/provider/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
