@@ -1,41 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ThemeNotifier extends ChangeNotifier {
   static const String themeKey = 'theme_mode';
   ThemeMode _themeMode = ThemeMode.system;
-  bool _isInitialized = false;
 
   ThemeMode get themeMode => _themeMode;
-  bool get isInitialized => _isInitialized;
 
   ThemeNotifier() {
-    _loadThemeFromPreferences();
+    _loadThemeFromHive();
   }
 
   Future<void> toggleTheme(ThemeMode mode) async {
     _themeMode = mode;
     notifyListeners();
-    await _saveThemeToPreferences();
+    await _saveThemeToHive();
   }
 
-  Future<void> _loadThemeFromPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedTheme = prefs.getString(themeKey);
+  void _loadThemeFromHive() {
+    final box = Hive.box('settings');
+    final savedTheme = box.get(themeKey, defaultValue: ThemeMode.system.toString());
 
-    if (savedTheme != null) {
-      _themeMode = ThemeMode.values.firstWhere(
-        (mode) => mode.toString() == savedTheme,
-        orElse: () => ThemeMode.system,
-      );
-    }
-
-    _isInitialized = true;
+    _themeMode = ThemeMode.values.firstWhere(
+      (mode) => mode.toString() == savedTheme,
+      orElse: () => ThemeMode.system,
+    );
     notifyListeners();
   }
 
-  Future<void> _saveThemeToPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(themeKey, _themeMode.toString());
+  Future<void> _saveThemeToHive() async {
+    final box = Hive.box('settings');
+    await box.put(themeKey, _themeMode.toString());
   }
 }

@@ -11,6 +11,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  
   @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
@@ -33,7 +34,7 @@ class _MenuScreenState extends State<MenuScreen> {
               value: themeNotifier.themeMode,
               onChanged: (ThemeMode? newMode) {
                 if (newMode != null) {
-                  themeNotifier.toggleTheme(newMode); 
+                  themeNotifier.toggleTheme(newMode);
                 }
               },
               items: const [
