@@ -1,20 +1,20 @@
-import 'package:cointracker/provider/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'core/routes.dart';
 import 'core/theme.dart';
+import 'provider/currency.dart';
+import 'provider/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter();
-  await Hive.openBox('settings');
-
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+        ChangeNotifierProvider(create: (_) => CurrencyNotifier()),
+      ],
       child: const MainApp(),
     ),
   );
