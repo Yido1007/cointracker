@@ -265,23 +265,37 @@ class _CoinChartPageState extends State<CoinChartPage> {
                   child: GridView(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      mainAxisSpacing: 15,
+                      mainAxisSpacing: 25, // Dikey boşluk artırıldı
+                      crossAxisSpacing: 15, // Yatay boşluk da istenirse ayarlanabilir
                       childAspectRatio: 5,
                     ),
                     shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Scroll yeteneğini devre dışı bırakır
+                    physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      Text('Popülerlik Sırası:\n#${stats['popularity']}',
-                          textAlign: TextAlign.start),
-                      Text('Piyasa Değeri:\n${formatMarketCap(marketCap)}',
-                          textAlign: TextAlign.start),
-                      Text('24 Küresel Hacim:\n${formatVolume(stats['volume24h'])}',
-                          textAlign: TextAlign.start),
-                      Text('24S Hacim Değişimi:\n${stats['volumeChange24h'].toStringAsFixed(2)}%',
-                          textAlign: TextAlign.start),
-                      Text('24S En Yüksek:\n\$${stats['high24h']}', textAlign: TextAlign.start),
-                      Text('24S En Düşük:\n\$${stats['low24h']}', textAlign: TextAlign.start),
+                      Text(
+                        'Popülerlik Sırası:\n#${stats['popularity']}',
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        'Piyasa Değeri:\n${formatMarketCap(marketCap)}',
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        '24 Küresel Hacim:\n${formatVolume(stats['volume24h'])}',
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        '24S Hacim Değişimi:\n${stats['volumeChange24h'].toStringAsFixed(2)}%',
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        '24S En Yüksek:\n\$${stats['high24h']}',
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        '24S En Düşük:\n\$${stats['low24h']}',
+                        textAlign: TextAlign.start,
+                      ),
                     ],
                   ),
                 );
