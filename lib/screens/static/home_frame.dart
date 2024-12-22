@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../model/coin.dart';
 import '../../services/coin.dart';
 
@@ -13,7 +12,6 @@ class HomeScreenFrame extends StatefulWidget {
 
 class _HomeScreenFrameState extends State<HomeScreenFrame> {
   late Future<List<Coin>> futureCoins;
-  String selectedCurrency = 'USD'; // Varsayılan para birimi
 
   @override
   void initState() {
@@ -32,20 +30,6 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Coin Listesi'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              // Para birimini değiştir
-              setState(() {
-                selectedCurrency = selectedCurrency == 'USD' ? 'TRY' : 'USD';
-              });
-            },
-            icon: Icon(
-              selectedCurrency == 'USD' ? Icons.attach_money : Icons.currency_lira,
-            ),
-            tooltip: 'Para Birimi: $selectedCurrency',
-          ),
-        ],
       ),
       body: RefreshIndicator(
         onRefresh: _refreshCoins,
@@ -69,15 +53,10 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
                     ? Colors.green
                     : Theme.of(context).colorScheme.error;
 
-                // Fiyat dönüşümü
-                final currentPrice = selectedCurrency == 'USD'
-                    ? '\$${coin.currentPrice.toStringAsFixed(2)}'
-                    : '${(coin.currentPrice * 27).toStringAsFixed(2)} ₺';
-
                 return ListTile(
                   leading: Image.network(coin.image, width: 40, height: 40),
                   title: Text(coin.name),
-                  subtitle: Text(currentPrice), // Dinamik fiyat
+                  subtitle: Text('${coin.currentPrice} USD'),
                   trailing: Text(
                     '${coin.priceChangePercentage24h.toStringAsFixed(2)}%',
                     style: TextStyle(color: priceChangeColor),
