@@ -43,16 +43,16 @@ class BottomMenu extends StatelessWidget {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home_outlined),
-          label: ("home"),
+          label: ("Home"),
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.search),
-          label: ("search"),
+          label: ("Search"),
         ),
         // Coins Screen Navigation
         BottomNavigationBarItem(
           icon: Icon(Icons.settings),
-          label: ("menu"),
+          label: ("Menu"),
         ),
       ],
     );

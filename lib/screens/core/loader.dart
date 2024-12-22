@@ -14,7 +14,7 @@ class _LoaderScreenState extends State<LoaderScreen> {
 
   Future<void> loadApp() async {
     final storage = Storage();
-    storage.clearStorage();
+    // storage.clearStorage();
     try {
       final isFirstLaunch = await storage.isFirstLaunch();
       if (isFirstLaunch) {
