@@ -152,7 +152,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 children: [
                   Expanded(
                     child: searchResults.isEmpty
-                        ? const Center(child: Text('Sonuç bulunamadı'))
+                        ? const Center(child: Text(''))
                         : ListView.builder(
                             itemCount: searchResults.length,
                             itemBuilder: (context, index) {

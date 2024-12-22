@@ -211,7 +211,6 @@ class _CoinChartPageState extends State<CoinChartPage> {
                                 final time = index >= 0 && index < timeLabels.length
                                     ? timeLabels[index]
                                     : 'Bilinmiyor';
-
                                 return LineTooltipItem(
                                   selectedRange == '1'
                                       ? 'Saat: $time\nFiyat: \$${spot.y.toStringAsFixed(2)}'
