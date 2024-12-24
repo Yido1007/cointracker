@@ -33,4 +33,20 @@ class Storage {
     final SharedPreferences storage = await SharedPreferences.getInstance();
     await storage.clear();
   }
+
+  setConfig({String? language, bool? darkMode}) async {
+    final SharedPreferences storage = await SharedPreferences.getInstance();
+
+    if (language != null) {
+      await storage.setString("language", language);
+    }
+  }
+
+  // get config function
+  getConfig() async {
+    final SharedPreferences storage = await SharedPreferences.getInstance();
+    return {
+      "language": storage.getString("language"),
+    };
+  }
 }
