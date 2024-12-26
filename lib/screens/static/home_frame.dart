@@ -43,7 +43,6 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(child: Text('Coin bulunamadı.'));
             }
-
             final coins = snapshot.data!;
             return ListView.builder(
               itemCount: coins.length,
@@ -52,18 +51,24 @@ class _HomeScreenFrameState extends State<HomeScreenFrame> {
                 final priceChangeColor = coin.priceChangePercentage24h >= 0
                     ? Colors.green
                     : Theme.of(context).colorScheme.error;
-
-                return ListTile(
-                  leading: Image.network(coin.image, width: 40, height: 40),
-                  title: Text(coin.name),
-                  subtitle: Text('${coin.currentPrice} USD'),
-                  trailing: Text(
-                    '${coin.priceChangePercentage24h.toStringAsFixed(2)}%',
-                    style: TextStyle(color: priceChangeColor),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+                  child: Card(
+                    elevation: 3,
+                    shadowColor: Colors.black87,
+                    child: ListTile(
+                      leading: Image.network(coin.image, width: 40, height: 40),
+                      title: Text(coin.name),
+                      subtitle: Text('${coin.currentPrice} USD'),
+                      trailing: Text(
+                        '${coin.priceChangePercentage24h.toStringAsFixed(2)}%',
+                        style: TextStyle(color: priceChangeColor),
+                      ),
+                      onTap: () {
+                        context.push('/coin_chart/${coin.id}');
+                      },
+                    ),
                   ),
-                  onTap: () {
-                    context.push('/coin_chart/${coin.id}');
-                  },
                 );
               },
             );

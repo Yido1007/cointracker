@@ -265,8 +265,8 @@ class _CoinChartPageState extends State<CoinChartPage> {
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 25, // Dikey boşluk artırıldı
-                      crossAxisSpacing: 15, // Yatay boşluk da istenirse ayarlanabilir
-                      childAspectRatio: 5,
+                      crossAxisSpacing: 20, // Yatay boşluk da istenirse ayarlanabilir
+                      childAspectRatio: 4,
                     ),
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),

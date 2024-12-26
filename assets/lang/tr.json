@@ -1,3 +1,9 @@
 {
-    "home":"Başlık"
+    "home":"Ana Sayfa",
+    "search":"Ara",
+    "menu":"Menü",
+    "coin-list":"Kripto Listesi",
+    "last-seen":"Geçmiş",
+    "clear":"Temizle",
+    "search-coin":"Coin Ara"
 }

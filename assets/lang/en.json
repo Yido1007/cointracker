@@ -1,3 +1,9 @@
 {
-    "home":"title"
+    "home":"Home",
+    "search":"Search",
+    "menu":"Menu",
+    "coin-list":"Coin List",
+    "last-seen":"History",
+    "clear":"Clear",
+    "search-coin":"Search Coin"
 }
