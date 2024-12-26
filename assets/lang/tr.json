@@ -5,5 +5,19 @@
     "coin-list":"Kripto Listesi",
     "last-seen":"Geçmiş",
     "clear":"Temizle",
-    "search-coin":"Coin Ara"
+    "search-coin":"Coin Ara",
+    "light-theme":"Açık Tema",
+    "dark-theme":"Koyu Tema",
+    "system-theme":"Sistem Teması",
+    "1day":"1 Günlük",
+    "1week":"1 Haftalık",
+    "3month":"3 Aylık",
+    "popularity":"Popülerlik Sırası",
+    "volume":"24S Küresel Hacmi",
+    "value":"Piyasa Değeri",
+    "volume-change":"24S Hacim Değişimi",
+    "high":"24S En Yüksek",
+    "low":"24S En Düşük",
+    "hour":"Saat: ",
+    "price":"Fiyat: "
 }

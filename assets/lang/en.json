@@ -5,5 +5,19 @@
     "coin-list":"Coin List",
     "last-seen":"History",
     "clear":"Clear",
-    "search-coin":"Search Coin"
+    "search-coin":"Search Coin",
+    "light-theme":"Light Theme",
+    "dark-theme":"Dark Theme",
+    "system-theme":"System Theme",
+    "1day":"1 Day",
+    "1week":"1 Week",
+    "3month":"3 Month",
+    "popularity":"Order of Popularity",
+    "volume":"24S Global Colume",
+    "value":"Market Value",
+    "volume-change":"24S Volume Change",
+    "high":"24S Highest",
+    "low":"24S Lowest",
+    "hour":"Hour: ",
+    "price":"Price: "
 }

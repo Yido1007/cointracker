@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import '../../bloc/client_cubit.dart';
+import '../../core/localizations.dart';
 import 'coinchart.dart'; // Grafik sayfasını içe aktar
 
 class SearchScreen extends StatefulWidget {
@@ -13,6 +16,7 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  late ClientCubit clientCubit;
   TextEditingController searchController = TextEditingController();
   List<dynamic> searchResults = [];
   List<Map<String, dynamic>> searchHistory = [];
@@ -22,6 +26,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _loadSearchHistory(); // Uygulama açıldığında geçmişi yükle
+    clientCubit = context.read<ClientCubit>();
   }
 
   // Coinleri API'den ara
@@ -118,121 +123,123 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Coin Arama'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: searchController,
-              onChanged: (value) {
-                searchCoins(value);
-              },
-              decoration: InputDecoration(
-                labelText: 'Coin Ara',
-                border: const OutlineInputBorder(),
-                suffixIcon: searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          searchController.clear();
-                          searchCoins('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 16),
-            if (isLoading) const CircularProgressIndicator(),
-            Expanded(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: searchResults.isEmpty
-                        ? const Center(child: Text(''))
-                        : ListView.builder(
-                            itemCount: searchResults.length,
-                            itemBuilder: (context, index) {
-                              final coin = searchResults[index];
-                              return ListTile(
-                                leading: Image.network(
-                                  coin['thumb'],
-                                  width: 40,
-                                  height: 40,
-                                ),
-                                title: Text(coin['name']),
-                                subtitle: Text(coin['symbol'].toUpperCase()),
-                                onTap: () {
-                                  addToHistory(coin);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CoinChartPage(coinId: coin['id']),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                  ),
-                  if (searchHistory.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Geçmiş',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            TextButton(
-                              onPressed: clearHistory,
-                              child: Text(
-                                'Temizle',
-                                style: TextStyle(color: Theme.of(context).colorScheme.error),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        SizedBox(
-                          height: 150,
-                          child: ListView.builder(
-                            itemCount: searchHistory.length,
-                            itemBuilder: (context, index) {
-                              final coin = searchHistory[index];
-                              return ListTile(
-                                leading: Image.network(
-                                  coin['thumb'],
-                                  width: 40,
-                                  height: 40,
-                                ),
-                                title: Text(coin['name']),
-                                subtitle: Text(coin['symbol'].toUpperCase()),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CoinChartPage(coinId: coin['id']),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
-          ],
+    return BlocBuilder<ClientCubit, ClientState>(builder: (context, state) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("COIN TRACKER"),
         ),
-      ),
-    );
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  searchCoins(value);
+                },
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).getTranslate("search-coin"),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () {
+                            searchController.clear();
+                            searchCoins('');
+                          },
+                        )
+                      : null,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (isLoading) const CircularProgressIndicator(),
+              Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: searchResults.isEmpty
+                          ? const Center(child: Text(''))
+                          : ListView.builder(
+                              itemCount: searchResults.length,
+                              itemBuilder: (context, index) {
+                                final coin = searchResults[index];
+                                return ListTile(
+                                  leading: Image.network(
+                                    coin['thumb'],
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  title: Text(coin['name']),
+                                  subtitle: Text(coin['symbol'].toUpperCase()),
+                                  onTap: () {
+                                    addToHistory(coin);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CoinChartPage(coinId: coin['id']),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                    if (searchHistory.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                AppLocalizations.of(context).getTranslate("last-seen"),
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              TextButton(
+                                onPressed: clearHistory,
+                                child: Text(
+                                  AppLocalizations.of(context).getTranslate("clear"),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 150,
+                            child: ListView.builder(
+                              itemCount: searchHistory.length,
+                              itemBuilder: (context, index) {
+                                final coin = searchHistory[index];
+                                return ListTile(
+                                  leading: Image.network(
+                                    coin['thumb'],
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  title: Text(coin['name']),
+                                  subtitle: Text(coin['symbol'].toUpperCase()),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CoinChartPage(coinId: coin['id']),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }

@@ -1,7 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import '../../bloc/client_cubit.dart';
+import '../../core/localizations.dart';
 
 class CoinChartPage extends StatefulWidget {
   final String coinId;
@@ -124,11 +128,13 @@ class _CoinChartPageState extends State<CoinChartPage> {
     }
   }
 
+  late ClientCubit clientCubit;
   @override
   void initState() {
     super.initState();
     futureSpots = fetchCoinPrices(selectedRange);
     coinStats = fetchCoinStats();
+    clientCubit = context.read<ClientCubit>();
   }
 
   void updateChartRange(String range) {
@@ -140,169 +146,172 @@ class _CoinChartPageState extends State<CoinChartPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.coinId.toUpperCase()} Grafiği'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.55,
-              child: FutureBuilder<List<FlSpot>>(
-                future: futureSpots,
+    return BlocBuilder<ClientCubit, ClientState>(builder: (context, state) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('${widget.coinId.toUpperCase()} Grafiği'),
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.55,
+                child: FutureBuilder<List<FlSpot>>(
+                  future: futureSpots,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Hata: ${snapshot.error}'));
+                    }
+
+                    final spots = snapshot.data!;
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: LineChart(
+                        LineChartData(
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: spots,
+                              isCurved: true,
+                              color: Theme.of(context).colorScheme.primary,
+                              shadow: const Shadow(color: Colors.black38),
+                              barWidth: 3,
+                              belowBarData: BarAreaData(show: false),
+                              dotData: const FlDotData(show: false),
+                            ),
+                          ],
+                          minY: minY,
+                          maxY: maxY,
+                          titlesData: FlTitlesData(
+                            leftTitles: const AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: false,
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                getTitlesWidget: (value, meta) {
+                                  final index = value.toInt();
+                                  if (index >= 0 && index < timeLabels.length - 1) {
+                                    return Text(
+                                      timeLabels[index],
+                                      style: const TextStyle(fontSize: 10),
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                            ),
+                            rightTitles:
+                                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          ),
+                          lineTouchData: LineTouchData(
+                            touchTooltipData: LineTouchTooltipData(
+                              getTooltipColor: (touchedSpot) =>
+                                  Theme.of(context).colorScheme.secondary,
+                              getTooltipItems: (touchedSpots) {
+                                return touchedSpots.map((spot) {
+                                  final index = spot.x.toInt();
+                                  final time = index >= 0 && index < timeLabels.length
+                                      ? timeLabels[index]
+                                      : 'Bilinmiyor';
+                                  return LineTooltipItem(
+                                    selectedRange == '1'
+                                        ? 'Saat: $time\nFiyat: \$${spot.y.toStringAsFixed(2)}'
+                                        : 'Tarih: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}',
+                                    const TextStyle(color: Colors.white),
+                                  );
+                                }).toList();
+                              },
+                              tooltipPadding: const EdgeInsets.all(8),
+                              tooltipRoundedRadius: 8,
+                              fitInsideHorizontally: true,
+                              fitInsideVertically: true,
+                            ),
+                            handleBuiltInTouches: true,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => updateChartRange('1'),
+                    child: Text(AppLocalizations.of(context).getTranslate("1day")),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => updateChartRange('7'),
+                    child: Text(AppLocalizations.of(context).getTranslate("1week")),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => updateChartRange('90'),
+                    child: Text(AppLocalizations.of(context).getTranslate("3month")),
+                  ),
+                ],
+              ),
+              FutureBuilder<Map<String, dynamic>>(
+                future: coinStats,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Hata: ${snapshot.error}'));
                   }
-
-                  final spots = snapshot.data!;
+                  final stats = snapshot.data!;
+                  final marketCap = stats['marketCap'];
                   return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: LineChart(
-                      LineChartData(
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: spots,
-                            isCurved: true,
-                            color: Theme.of(context).colorScheme.primary,
-                            shadow: const Shadow(color: Colors.black38),
-                            barWidth: 3,
-                            belowBarData: BarAreaData(show: false),
-                            dotData: const FlDotData(show: false),
-                          ),
-                        ],
-                        minY: minY,
-                        maxY: maxY,
-                        titlesData: FlTitlesData(
-                          leftTitles: const AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: false,
-                            ),
-                          ),
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 40,
-                              getTitlesWidget: (value, meta) {
-                                final index = value.toInt();
-                                if (index >= 0 && index < timeLabels.length - 1) {
-                                  return Text(
-                                    timeLabels[index],
-                                    style: const TextStyle(fontSize: 10),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                          ),
-                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                        ),
-                        lineTouchData: LineTouchData(
-                          touchTooltipData: LineTouchTooltipData(
-                            getTooltipColor: (touchedSpot) =>
-                                Theme.of(context).colorScheme.secondary,
-                            getTooltipItems: (touchedSpots) {
-                              return touchedSpots.map((spot) {
-                                final index = spot.x.toInt();
-                                final time = index >= 0 && index < timeLabels.length
-                                    ? timeLabels[index]
-                                    : 'Bilinmiyor';
-                                return LineTooltipItem(
-                                  selectedRange == '1'
-                                      ? 'Saat: $time\nFiyat: \$${spot.y.toStringAsFixed(2)}'
-                                      : 'Tarih: $time\nFiyat: \$${spot.y.toStringAsFixed(4)}',
-                                  const TextStyle(color: Colors.white),
-                                );
-                              }).toList();
-                            },
-                            tooltipPadding: const EdgeInsets.all(8),
-                            tooltipRoundedRadius: 8,
-                            fitInsideHorizontally: true,
-                            fitInsideVertically: true,
-                          ),
-                          handleBuiltInTouches: true,
-                        ),
+                    padding: const EdgeInsets.all(20.0),
+                    child: GridView(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 25, // Dikey boşluk artırıldı
+                        crossAxisSpacing: 20, // Yatay boşluk da istenirse ayarlanabilir
+                        childAspectRatio: 4,
                       ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        Text(
+                          'Popülerlik Sırası:\n#${stats['popularity']}',
+                          textAlign: TextAlign.start,
+                        ),
+                        Text(
+                          'Piyasa Değeri:\n${formatMarketCap(marketCap)}',
+                          textAlign: TextAlign.start,
+                        ),
+                        Text(
+                          '24 Küresel Hacim:\n${formatVolume(stats['volume24h'])}',
+                          textAlign: TextAlign.start,
+                        ),
+                        Text(
+                          '24S Hacim Değişimi:\n${stats['volumeChange24h'].toStringAsFixed(2)}%',
+                          textAlign: TextAlign.start,
+                        ),
+                        Text(
+                          '24S En Yüksek:\n\$${stats['high24h']}',
+                          textAlign: TextAlign.start,
+                        ),
+                        Text(
+                          '24S En Düşük:\n\$${stats['low24h']}',
+                          textAlign: TextAlign.start,
+                        ),
+                      ],
                     ),
                   );
                 },
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () => updateChartRange('1'),
-                  child: const Text('1 Günlük'),
-                ),
-                ElevatedButton(
-                  onPressed: () => updateChartRange('7'),
-                  child: const Text('1 Haftalık'),
-                ),
-                ElevatedButton(
-                  onPressed: () => updateChartRange('90'),
-                  child: const Text('3 Aylık'),
-                ),
-              ],
-            ),
-            FutureBuilder<Map<String, dynamic>>(
-              future: coinStats,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Hata: ${snapshot.error}'));
-                }
-                final stats = snapshot.data!;
-                final marketCap = stats['marketCap'];
-                return Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: GridView(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 25, // Dikey boşluk artırıldı
-                      crossAxisSpacing: 20, // Yatay boşluk da istenirse ayarlanabilir
-                      childAspectRatio: 4,
-                    ),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      Text(
-                        'Popülerlik Sırası:\n#${stats['popularity']}',
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        'Piyasa Değeri:\n${formatMarketCap(marketCap)}',
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        '24 Küresel Hacim:\n${formatVolume(stats['volume24h'])}',
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        '24S Hacim Değişimi:\n${stats['volumeChange24h'].toStringAsFixed(2)}%',
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        '24S En Yüksek:\n\$${stats['high24h']}',
-                        textAlign: TextAlign.start,
-                      ),
-                      Text(
-                        '24S En Düşük:\n\$${stats['low24h']}',
-                        textAlign: TextAlign.start,
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }

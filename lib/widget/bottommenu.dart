@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/localizations.dart';
+
 class BottomMenu extends StatelessWidget {
   final String currentPath;
 
@@ -40,19 +42,19 @@ class BottomMenu extends StatelessWidget {
         }
       },
       // Home Screen Navigation
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          label: ("Home"),
+          icon: const Icon(Icons.currency_bitcoin_sharp),
+          label: AppLocalizations.of(context).getTranslate("home"),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: ("Search"),
+          icon: const Icon(Icons.search),
+          label: AppLocalizations.of(context).getTranslate("search"),
         ),
         // Coins Screen Navigation
         BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: ("Menu"),
+          icon: const Icon(Icons.settings),
+          label: AppLocalizations.of(context).getTranslate("menu"),
         ),
       ],
     );

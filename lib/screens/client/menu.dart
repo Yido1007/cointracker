@@ -30,7 +30,8 @@ class _MenuScreenState extends State<MenuScreen> {
     return BlocBuilder<ClientCubit, ClientState>(builder: (context, state) {
       return Scaffold(
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context).getTranslate("home")),
+          title: Text(AppLocalizations.of(context).getTranslate("menu")),
+          centerTitle: false,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -54,18 +55,18 @@ class _MenuScreenState extends State<MenuScreen> {
                     themeNotifier.toggleTheme(newMode);
                   }
                 },
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: ThemeMode.system,
-                    child: Text('Sistem Teması'),
+                    child: Text(AppLocalizations.of(context).getTranslate("system-theme")),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.light,
-                    child: Text('Açık Tema'),
+                    child: Text(AppLocalizations.of(context).getTranslate("light-theme")),
                   ),
                   DropdownMenuItem(
                     value: ThemeMode.dark,
-                    child: Text('Koyu Tema'),
+                    child: Text(AppLocalizations.of(context).getTranslate("dark-theme")),
                   ),
                 ],
               ),
