@@ -1,6 +1,5 @@
-import 'package:cointracker/screens/client/menu.dart';
+
 import 'package:cointracker/screens/client/search.dart';
-import 'package:cointracker/screens/static/languages.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,11 +35,6 @@ final routes = GoRouter(
           path: '/search',
           pageBuilder: (context, state) => const NoTransitionPage(child: SearchScreen()),
         ),
-        GoRoute(
-          parentNavigatorKey: _shellNavigatorKey,
-          path: '/menu',
-          pageBuilder: (context, state) => const NoTransitionPage(child: MenuScreen()),
-        ),
       ],
     ),
     GoRoute(
@@ -50,10 +44,6 @@ final routes = GoRouter(
     GoRoute(
       path: '/boarding',
       builder: (context, state) => const BoardingScreen(),
-    ),
-    GoRoute(
-      path: '/lang',
-      builder: (context, state) => const LanguageScreen(),
     ),
     // CoinChartPage için üst düzey rota
     GoRoute(

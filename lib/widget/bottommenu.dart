@@ -36,9 +36,6 @@ class BottomMenu extends StatelessWidget {
           case 1:
             GoRouter.of(context).go("/search");
             break;
-          case 2:
-            GoRouter.of(context).go("/menu");
-            break;
         }
       },
       // Home Screen Navigation
@@ -50,11 +47,6 @@ class BottomMenu extends StatelessWidget {
         BottomNavigationBarItem(
           icon: const Icon(Icons.search),
           label: AppLocalizations.of(context).getTranslate("search"),
-        ),
-        // Coins Screen Navigation
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.settings),
-          label: AppLocalizations.of(context).getTranslate("menu"),
         ),
       ],
     );
