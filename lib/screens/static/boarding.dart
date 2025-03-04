@@ -80,7 +80,7 @@ class _BoardingScreenState extends State<BoardingScreen> {
                   await storage.firstLaunched();
                   GoRouter.of(context).replace("/home");
                 },
-                child: Text(page == boardingData.length - 1 ? "Finish" : "Skip"),
+                child: Text(page == boardingData.length - 1 ? "Bitir" : "Atla"),
               ),
             ),
           ],
